@@ -59,6 +59,8 @@ void BL_voidSetConfigLoRa(){
 			SX1278_LORA_BW_125KHZ, SX1278_LORA_CR_4_5, SX1278_LORA_CRC_EN, 16);
 }
 //**************************Function Define***************************//
+
+//*CRC Function*******************************************************//
 uint8_t BL_Check_CRC(uint32_t CRC_expect , uint8_t *buffer_check){
 	uint32_t Local_u32PlayloadCheck = BL_INITIALIZE_WITH_ZERO;
 	RCC->AHBENR |=0x40;
@@ -91,10 +93,14 @@ uint32_t BL_Calculate_CRC(uint8_t *buffer , uint32_t lenght){
 		Local_u32CRC = CRC->DR;
 		return Local_u32CRC;
 }
+
+// ???? Why dont use uint32_t BL_u32ReadAddressData(uint32_t address)
 uint32_t BL_Read_Address_Node(){
 	uint32_t Local_u32AddressData = *((volatile uint32_t*)(FLAG_INDICATE_ADDRESS_NODE));
 	return Local_u32AddressData;
 }
+
+
 void BL_voidCopyImageToActiveRegion(void){
 	FLASH_EraseInitTypeDef Local_eraseInfo;
 	uint32_t Local_u32PageError;
@@ -388,14 +394,15 @@ void BL_voidJumpToBootloader(void)
 
 void BL_voidEraseRestoreHeaderPage(uint32_t Copy_u32Address, uint32_t Copy_u32NewData)
 {
-	uint32_t Local_u32AddressArray	[NUMBER_OF_FLAGS];
-	uint32_t Local_u32DataArray		[NUMBER_OF_FLAGS];
+	uint32_t Local_u32AddressArray	[NUMBER_OF_FLAGS]; 
+	uint32_t Local_u32DataArray		[NUMBER_OF_FLAGS]; //save previous flag
 	uint16_t Local_u16DataIndex        = 0;
 	uint16_t Local_u16DataCounter      = 0;
 	uint32_t Local_u32AddressCounter   = 0;
 
 	//Copy all flag to array before erase
-	for( Local_u32AddressCounter = START_OF_FLAG_REGION ;Local_u32AddressCounter < END_OF_FLAG_REGION;)
+	Local_u32AddressCounter = START_OF_FLAG_REGION;
+	for(  ;Local_u32AddressCounter < END_OF_FLAG_REGION;)
 	{
 		if( (Local_u32AddressCounter != Copy_u32Address) & (*((volatile uint32_t*)(Local_u32AddressCounter)) != ERASED_VALUE))
 		{
@@ -407,6 +414,7 @@ void BL_voidEraseRestoreHeaderPage(uint32_t Copy_u32Address, uint32_t Copy_u32Ne
 	}
 
 	// Erase the Flag region.
+	// add flash erase function  for this in flash.c
 	FLASH_EraseInitTypeDef Local_eraseInfo;
 	uint32_t Local_u32PageError;
 	Local_eraseInfo.TypeErase = FLASH_TYPEERASE_PAGES;
@@ -436,8 +444,8 @@ void BL_voidSetBranchingFlagAndMakeSWR(void)
 /*Update size of Image in header*/
 void BL_voidUpdateHeaders(void)
 {
-	uint32_t Local_u32ImageSizeInBytes         = BL_INITIALIZE_WITH_ZERO;
-	uint32_t Local_u32CRCImage 					=BL_INITIALIZE_WITH_ZERO;
+	uint32_t Local_u32ImageSizeInBytes          = BL_INITIALIZE_WITH_ZERO;
+	uint32_t Local_u32CRCImage 				 	= BL_INITIALIZE_WITH_ZERO;
 	uint32_t Local_u32VerImage 					= BL_INITIALIZE_WITH_ZERO;
 	uint32_t Local_counter 						= BL_INITIALIZE_WITH_ZERO;
 	//Structure LoRa Transmit

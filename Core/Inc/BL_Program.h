@@ -41,22 +41,24 @@
 #define SCB_VTOR_ADDRESS  (0xE000ED08)
 #define SCB_VTOR         *((volatile u32 *)SCB_VTOR_ADDRESS)
 
-//Flag status Image
-#define NUMBER_OF_FLAGS				  20U
-#define PAGE_NUMBER_IN_FLAG_REGION    127U
+//Boot Flag status Image 
+#define NUMBER_OF_FLAGS				          20U
+#define PAGE_NUMBER_IN_FLAG_REGION            127U
 #define WORD_SIZE_IN_BYTE                     4U
-#define START_OF_FLAG_REGION                  0x0801FC00
+#define START_OF_FLAG_REGION                  0x0801FC00   
 #define END_OF_FLAG_REGION                    0x0801FC50
 #define ERASED_VALUE                          0xffffffff
 #define FLAG_STATUS_BOOTLOADER                (START_OF_FLAG_REGION)
 #define FLAG_IMAGE							   FLAG_STATUS_BOOTLOADER
-#define  NUM_PACKETS_MAX 						0x2C0U //704 packet
+#define NUM_PACKETS_MAX 						0x2C0U //704 packet
+
 //Status region Bank 1
 #define FLAG_STATUS_BANKFIRST_APP_VER_ADDRESS                       (0x0801FC10)
 #define FLAG_STATUS_BANKFIRST_REGION_ADDRESS                        (0x0801FC14)
 #define FLAG_STATUS_SIZE_BANKFIRST_REGION_ADDRESS                   (0x0801FC18)
 #define FLAG_STATUS_CRC_BANKFIRST_REGION_ADDRESS                    (0x0801FC1C)
 #define FLAG_STATUS_ENTRY_POINT_VALUE_BANKFIRST_REGION_ADDRESS      (0x0801FC20)
+
 //Status region Bank 2
 #define FLAG_STATUS_BANKSECOND_APP_VER_ADDRESS                      (0x0801FC30)
 #define FLAG_STATUS_BANKSECOND_REGION_ADDRESS                 		(0x0801FC34)
@@ -64,6 +66,7 @@
 #define FLAG_STATUS_CRC_BANKSECOND_REGION_ADDRESS                   (0x0801FC3C)
 #define FLAG_STATUS_ENTRY_POINT_VALUE_BANKSECOND_REGION_ADDRESS     (0x0801FC40)
 //
+
 //STATE BL
 //INIT BOOTLOADER
 #define STATE_INITBOOT 				0x01U
@@ -76,6 +79,7 @@
 //Status branching define FW active
 #define FLAG_INDICATE_ACTIVE_IMAGE_ADDRESS							(0x0801FC44)
 #define FLAG_INDICATE_ADDRESS_NODE									(0x0801FC04)
+
 // Branch Switch Constants
 #define BR_SHIFT_LEFT_24_BIT                        24U
 #define BR_SHIFT_LEFT_16_BIT                        16U
@@ -124,9 +128,15 @@ enum eBootloaderErrorCodes{
 
 
 // define struct bitmask
+// When transfer firmware it will send bitmap as number of packets and 
+// if the packet is lost it will set the bit in the bitmap
+//TODO: What if bitmask get error why sending and receive
+//TODO: In receive they may get wronng size of packet
+//IDEA : Need to add to ACK/NAK 
  typedef struct {
      uint8_t bitmask[(NUM_PACKETS_MAX + 7) / 8]; // Sử dụng mảng bitmask để lưu trữ các bit
  } Bitmask;
+
 // Sequence flash code define
 #define GW_START_FLASHING                				0x01u
 #define MCU_ACCEPT_REQUEST                          	0X05u

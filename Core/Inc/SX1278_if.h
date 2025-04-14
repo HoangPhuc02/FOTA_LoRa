@@ -43,6 +43,7 @@ typedef enum{
 	LORA_TIMEOUT = 			0x3,
 	LORA_FLASHING = 		32
 } LoRa_Return_t;
+
 extern uint32_t Local_u32SizeOfCode;
 extern uint8_t  Local_u8index_fragment;
 extern uint32_t u32Buffer_Flash[16];
